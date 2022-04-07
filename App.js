@@ -12,33 +12,34 @@ import * as Sentry from '@sentry/react-native';
 
 const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
 
-Sentry.init({ 
-  dsn: 'https://ffc139edf2344fa88803bba57e47d561@o87286.ingest.sentry.io/6316851', 
-  enableInExpoDevelopment: true,
-  enableNative: false,
-  debug: true,
-  tracesSampleRate: 1.0,
-  enableAutoSessionTracking: true,
-  integrations: [
-    new Sentry.ReactNativeTracing({
-      // tracingOrigins: ["localhost", "my-site-url.com", /^\//],
-      // ... other options
-      routingInstrumentation,
-    }),
-  ],
+Sentry.init({
+    dsn: DSN, 
+    sampleRate: 1,
+    tracesSampleRate: 1.0,
+    enableAutoSessionTracking: true,
+    integrations: [
+        new Sentry.ReactNativeTracing({
+            // Pass instrumentation to be used as `routingInstrumentation`
+            routingInstrumentation,
+        }),
+    ],
+    enableNative: false, // doing this due to some local environment issues -- you should not expect to enable this.
 });
 
 
 const Stack = createNativeStackNavigator()
 
-const App = () => {
+function App() {
   const navigation = React.useRef();
   return (
     <PaperProvider>
       <NavigationContainer
         ref={navigation}
         onReady={() => {
-          routingInstrumentation.registerNavigationContainer(navigation);
+            // Register the navigation container instrumentation
+            routingInstrumentation.registerNavigationContainer(
+                navigation
+            );
         }}
       >
         <Stack.Navigator>
@@ -52,7 +53,7 @@ const App = () => {
           <Stack.Screen name="Name" component={NameScreen} />
           <Stack.Screen name="Title" component={TitleScreen} options={({route}) => ({title: route.params.title})} />
         </Stack.Navigator>
-    </NavigationContainer>
+      </NavigationContainer>
     </PaperProvider>
   );
 }
