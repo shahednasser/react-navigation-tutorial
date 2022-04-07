@@ -8,12 +8,39 @@ import NameScreen from './screens/NameScreen';
 import TitleScreen from './screens/TitleScreen';
 import BackScreen from './screens/BackScreen';
 
+import * as Sentry from '@sentry/react-native';
+
+const routingInstrumentation = new Sentry.ReactNavigationInstrumentation();
+
+Sentry.init({ 
+  dsn: 'https://ffc139edf2344fa88803bba57e47d561@o87286.ingest.sentry.io/6316851', 
+  enableInExpoDevelopment: true,
+  enableNative: false,
+  debug: true,
+  tracesSampleRate: 1.0,
+  enableAutoSessionTracking: true,
+  integrations: [
+    new Sentry.ReactNativeTracing({
+      // tracingOrigins: ["localhost", "my-site-url.com", /^\//],
+      // ... other options
+      routingInstrumentation,
+    }),
+  ],
+});
+
+
 const Stack = createNativeStackNavigator()
 
-export default function App() {
+const App = () => {
+  const navigation = React.useRef();
   return (
     <PaperProvider>
-      <NavigationContainer>
+      <NavigationContainer
+        ref={navigation}
+        onReady={() => {
+          routingInstrumentation.registerNavigationContainer(navigation);
+        }}
+      >
         <Stack.Navigator>
           <Stack.Screen name="Home" component={HomeScreen} options={{
             headerRight: () => (
@@ -29,3 +56,5 @@ export default function App() {
     </PaperProvider>
   );
 }
+
+export default Sentry.wrap(App);

@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@react-navigation/native-stack": "^6.2.5",
+    "@sentry/react-native": "^3.4.0",
     "expo": "~43.0.2",
     "expo-status-bar": "~1.1.0",
     "react": "17.0.1",
